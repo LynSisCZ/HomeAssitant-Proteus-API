@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Nastavení Proteus API",
+        "description": "Zadejte přihlašovací údaje k Proteus",
+        "data": {
+          "email": "Email",
+          "password": "Heslo",
+          "inverter_id": "ID inverteru (volitelné)",
+          "household_id": "ID domácnosti (volitelné)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Nepodařilo se připojit k Proteus",
+      "invalid_auth": "Neplatné přihlašovací údaje",
+      "unknown": "Neočekávaná chyba"
+    },
+    "abort": {
+      "already_configured": "Toto zařízení již je nakonfigurováno"
+    }
+  }
+}
