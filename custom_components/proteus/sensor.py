@@ -410,10 +410,14 @@ class ProteusCurrentPriceSensor(ProteusBaseSensor):
     @property
     def native_value(self) -> float | None:
         """Return current price (consumption price in Kč/kWh)."""
+        import logging
+        _LOGGER = logging.getLogger(__name__)
+
         current_step = self.coordinator.data.get("current_step")
 
         # TRPC uses reference pointers - search for item containing actual metadata
         if current_step and isinstance(current_step, list):
+            _LOGGER.debug(f"Current step data contains {len(current_step)} items")
             for item in current_step:
                 if isinstance(item, dict) and "json" in item:
                     json_data = item["json"]
@@ -427,7 +431,10 @@ class ProteusCurrentPriceSensor(ProteusBaseSensor):
                                     # Use consumption price and convert MWh to kWh
                                     if "priceMwhConsumption" in metadata:
                                         price_mwh = metadata["priceMwhConsumption"]
-                                        return round(price_mwh / 1000, 2)  # MWh -> kWh
+                                        price_kwh = round(price_mwh / 1000, 2)
+                                        _LOGGER.debug(f"Found price in current_step metadata: {price_mwh} MWh = {price_kwh} Kč/kWh")
+                                        return price_kwh  # MWh -> kWh
+        _LOGGER.debug("No price found in current_step data")
         return None
 
 

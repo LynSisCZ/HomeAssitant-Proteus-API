@@ -156,16 +156,16 @@ class ProteusAPI:
     def get_dashboard_data(self) -> dict[str, Any]:
         """Get all dashboard data at once (batch API)."""
         procedures = [
-            "linkBoxes.connectionState",
-            "inverters.detail",
-            "commands.current",
-            "inverters.currentStep",
-            "prices.currentDistributionPrices",
-            "users.wsToken",
-            "inverters.extendedDetail",
-            "inverters.lastState",
-            "inverters.flexibilityRewardsSummary",
-            "controlPlans.active",
+            "linkBoxes.connectionState",      # 0
+            "inverters.detail",               # 1
+            "commands.current",               # 2
+            "inverters.currentStep",          # 3
+            "prices.currentDistributionPrices", # 4
+            "users.wsToken",                  # 5
+            "inverters.extendedDetail",       # 6
+            "inverters.lastState",            # 7
+            "inverters.flexibilityRewardsSummary", # 8
+            "controlPlans.active",            # 9
         ]
 
         inputs = [
@@ -184,20 +184,37 @@ class ProteusAPI:
         results = self._call_trpc(procedures, inputs)
 
         # Parse výsledky do strukturovaného dictionary
-        # Každý klíč obsahuje celý results list - senzory pak extrahují konkrétní data
+        # Extrahuj data pro každou proceduru podle indexu
         data = {
-            "linkbox_state": results,
-            "inverter_detail": results,
-            "current_commands": results,
-            "current_step": results,
-            "distribution_prices": results,
-            "ws_token": results,
-            "extended_detail": results,
-            "last_state": results,
-            "rewards_summary": results,
-            "control_plans": results,
+            "linkbox_state": self._extract_by_index(results, 0),
+            "inverter_detail": self._extract_by_index(results, 1),
+            "current_commands": self._extract_by_index(results, 2),
+            "current_step": self._extract_by_index(results, 3),
+            "distribution_prices": self._extract_by_index(results, 4),
+            "ws_token": self._extract_by_index(results, 5),
+            "extended_detail": self._extract_by_index(results, 6),
+            "last_state": self._extract_by_index(results, 7),
+            "rewards_summary": self._extract_by_index(results, 8),
+            "control_plans": self._extract_by_index(results, 9),
         }
         return data
+
+    def _extract_by_index(self, results: list, index: int) -> list:
+        """Extract all JSONL lines for a specific procedure index.
+
+        Returns a filtered list containing only items that belong to the given procedure.
+        This prevents mixing data from different procedures.
+        """
+        filtered = []
+        for result in results:
+            if isinstance(result, dict) and "json" in result:
+                json_data = result["json"]
+                # Check if this item belongs to our procedure index
+                if isinstance(json_data, list) and len(json_data) >= 1:
+                    # Format: [index, 0, [[data]]]
+                    if json_data[0] == index:
+                        filtered.append(result)
+        return filtered
 
     def _extract_data(self, results: list, index: int) -> Any:
         """Extract data from JSONL response."""
