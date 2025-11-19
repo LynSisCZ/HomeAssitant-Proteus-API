@@ -629,14 +629,21 @@ class ProteusUpcomingScheduleSensor(ProteusBaseSensor):
     @property
     def native_value(self) -> str | None:
         """Return summary of upcoming schedule."""
+        import logging
         from datetime import datetime
         from homeassistant.util import dt as dt_util
 
+        _LOGGER = logging.getLogger(__name__)
+
         control_plans = self.coordinator.data.get("control_plans")
+        _LOGGER.debug(f"Upcoming schedule: control_plans type={type(control_plans)}, len={len(control_plans) if control_plans else 0}")
+
         if control_plans:
             active_plan = self._extract_from_jsonl(control_plans, "activePlan")
+            _LOGGER.debug(f"Upcoming schedule: active_plan found={active_plan is not None}")
             if active_plan and isinstance(active_plan, dict):
                 steps = active_plan.get("payload", {}).get("steps", [])
+                _LOGGER.debug(f"Upcoming schedule: steps count={len(steps)}")
 
                 # Filter steps - only future steps
                 now = dt_util.now()

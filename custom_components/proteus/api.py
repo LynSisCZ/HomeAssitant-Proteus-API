@@ -204,6 +204,9 @@ class ProteusAPI:
 
         Returns a filtered list containing only items that belong to the given procedure.
         This prevents mixing data from different procedures.
+
+        If no items are found for the index, returns the entire results list as fallback
+        for backward compatibility.
         """
         filtered = []
         for result in results:
@@ -211,9 +214,19 @@ class ProteusAPI:
                 json_data = result["json"]
                 # Check if this item belongs to our procedure index
                 if isinstance(json_data, list) and len(json_data) >= 1:
-                    # Format: [index, 0, [[data]]]
-                    if json_data[0] == index:
+                    # Format: [index, 0, [[data]]] - check both int and string
+                    first_elem = json_data[0]
+                    if first_elem == index or first_elem == str(index):
                         filtered.append(result)
+
+        _LOGGER.debug(f"_extract_by_index: index={index}, found {len(filtered)} items from {len(results)} total")
+
+        # Fallback: if no items found for this index, return all results
+        # This ensures backward compatibility if TRPC response format changes
+        if not filtered:
+            _LOGGER.warning(f"_extract_by_index: No items found for index {index}, returning all {len(results)} results as fallback")
+            return results
+
         return filtered
 
     def _extract_data(self, results: list, index: int) -> Any:
