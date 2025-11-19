@@ -41,9 +41,8 @@ Integrace pro Home Assistant, která umožňuje sledovat data z Proteus API (Del
    - **Email**: Váš email do Proteus
    - **Heslo**: Vaše heslo
    - **Inverter ID** (volitelné): ID vašeho měniče
-   - **Household ID** (volitelné): ID vaší domácnosti
 
-> **Poznámka**: Pokud nezadáte Inverter ID a Household ID, integrace automaticky najde všechny dostupné měniče a použije první.
+> **Poznámka**: Pokud nezadáte Inverter ID, integrace automaticky najde všechny dostupné měniče a použije první.
 
 ## Manuální instalace
 
@@ -72,7 +71,7 @@ Integrace pro Home Assistant, která umožňuje sledovat data z Proteus API (Del
 - `sensor.proteus_daily_grid_export` - Denní export do sítě (kWh)
 
 ### Ceny
-- `sensor.proteus_current_price` - Aktuální cena (Kč/kWh)
+- `sensor.proteus_current_price` - Aktuální cena s distribucí (Kč/kWh) - z `inverters.currentStep`
 - `sensor.proteus_next_hour_price` - Cena příští hodiny (Kč/kWh)
 - `sensor.proteus_cheapest_hour_today` - Nejlevnější hodina dnes
 
@@ -81,10 +80,30 @@ Integrace pro Home Assistant, která umožňuje sledovat data z Proteus API (Del
 - `binary_sensor.proteus_cheapest_4h_block` - Je právě nejlevnější 4h blok? (on/off)
 
 ### Ostatní
-- `sensor.proteus_current_step` - Aktuální krok plánu
-- `sensor.proteus_upcoming_schedule` - Nadcházející plán
-- `sensor.proteus_connection_state` - Stav připojení
+- `sensor.proteus_current_step` - Aktuální krok plánu (režim baterie, cílové SoC, predikce)
+- `sensor.proteus_upcoming_schedule` - Nadcházející plán (pro custom kartu)
+- `sensor.proteus_connection_state` - Stav připojení (always "unknown" - endpoint vypnutý)
+- `sensor.proteus_flexibility_rewards` - Odměny za flexibilitu (Kč)
 - `calendar.proteus_control_plan` - Kalendář plánu řízení
+
+## API Endpointy
+
+Integrace využívá následující Proteus API endpointy:
+
+✅ **Aktivní endpointy:**
+- `inverters.list` - Seznam měničů
+- `commands.current` - Aktuální příkazy
+- `inverters.currentStep` - Aktuální krok (obsahuje ceny s distribucí)
+- `users.wsToken` - WebSocket token
+- `inverters.extendedDetail` - Rozšířené info o měniči
+- `inverters.lastState` - Aktuální stavy (SoC, výkony, atd.)
+- `inverters.flexibilityRewardsSummary` - Odměny za flexibilitu
+- `controlPlans.active` - Aktivní plán řízení
+
+❌ **Vypnuté endpointy (rate limit):**
+- `linkBoxes.connectionState` - Stav LinkBoxu (vyžaduje household_id)
+- `inverters.detail` - Detail měniče
+- `prices.currentDistributionPrices` - Distribuční ceny
 
 ## Custom Lovelace Card
 
