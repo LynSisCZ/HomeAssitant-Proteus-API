@@ -1,0 +1,5 @@
+{
+  "name": "Proteus API",
+  "render_readme": true,
+  "domains": ["sensor", "binary_sensor", "calendar"]
+}

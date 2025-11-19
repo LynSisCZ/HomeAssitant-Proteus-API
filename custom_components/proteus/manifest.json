@@ -1,0 +1,12 @@
+{
+  "domain": "proteus",
+  "name": "Proteus API",
+  "codeowners": ["@proteus"],
+  "config_flow": true,
+  "documentation": "https://github.com/yourusername/proteus-homeassistant",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/yourusername/proteus-homeassistant/issues",
+  "requirements": ["requests"],
+  "version": "1.0.5"
+}
